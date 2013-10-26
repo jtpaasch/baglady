@@ -125,6 +125,9 @@ INSTALLED_APPS = (
     # Third part apps.
     'south',
 
+    # Custom apps.
+    'apps.baglady',
+
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
