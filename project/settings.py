@@ -125,6 +125,7 @@ INSTALLED_APPS = (
     # Third party apps.
     'south',
     'tastypie',
+    'pubsub',
 
     # Custom apps.
     'apps.baglady',
