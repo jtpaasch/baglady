@@ -122,8 +122,9 @@ INSTALLED_APPS = (
     # Use django's built-in adm.n
     'django.contrib.admin',
 
-    # Third part apps.
+    # Third party apps.
     'south',
+    'tastypie',
 
     # Custom apps.
     'apps.baglady',
@@ -160,3 +161,13 @@ LOGGING = {
         },
     }
 }
+
+####################################################                            
+# EMAIL SETTINGS                                                                
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = 'jt@nara.me'
+EMAIL_HOST_PASSWORD = 'jofthet9'
+EMAIL_USE_TLS = True
+
