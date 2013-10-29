@@ -18,7 +18,8 @@ class AbstractBagladyAdminModel(admin.ModelAdmin):
         """
 
         # Get the full set of items.
-        full_set = super(AbstractBagladyAdminModel, self).queryset(request)
+        parent = super(AbstractBagladyAdminModel, self)
+        full_set = parent.queryset(request)
 
         # If the requesting user is the admin, return all bags.
         if request.user.is_superuser:
@@ -39,7 +40,8 @@ class AbstractBagladyAdminModel(admin.ModelAdmin):
             obj.owner = request.user
 
         # Now let the parent/super class save it.
-        super(AbstractBagladyAdminModel, self).save_model(request, obj, form, change)
+        parent = super(AbstractBagladyAdminModel, self)
+        parent.save_model(request, obj, form, change)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """
@@ -49,7 +51,8 @@ class AbstractBagladyAdminModel(admin.ModelAdmin):
 
         # The superuser can see everything.
         if request.user.is_superuser:
-            return super(AbstractBagladyAdminModel, self).formfield_for_foreignkey(db_field, request, *kwargs)
+            parent = super(AbstractBagladyAdminModel, self)
+            return parent.formfield_for_foreignkey(db_field, request, *kwargs)
 
         # Otherwise, the user can only see their own items.
         else:
@@ -69,9 +72,6 @@ class BagAdmin(AbstractBagladyAdminModel):
 
     # Which fields should we hide in the detail view? 
     exclude = ['owner']
-
-    # Which fields can't be edited?
-    readonly_fields = ['public_key', 'private_key']
 
 
 # Register Bags with the admin.
@@ -102,7 +102,13 @@ class ScribbleAdmin(AbstractBagladyAdminModel):
     """
 
     # Which fields should we show in the list display?
-    list_display = ['content', 'category', 'time_sent', 'group_key', 'session_key']
+    list_display = [
+        'content', 
+        'category', 
+        'time_sent', 
+        'group_key', 
+        'session_key'
+    ]
 
     # Which fields should we hide in the detail view?
     exclude = ['owner']

@@ -7,47 +7,34 @@ from apps.baglady.models import Bag, Category, Scribble
 # Use Tastypie's fields module for foreign keys.
 from tastypie import fields
 
-# We'll use tastypie's authorization class.
-from tastypie.authorization import Authorization
+# We'll use Tastypie's basic auth for authentication.
+from tastypie.authentication import BasicAuthentication
+
+# We'll use our own Authorization class for authorization.
+from apps.baglady.authorization import CustomAuthorization
 
 # We'll use our own utils class.
 from apps.baglady.utils import Utils
 
-# We'll use Tastypie's HTTP methods and exceptions.                             
-from tastypie import http
-from tastypie.exceptions import ImmediateHttpResponse
 
-
-class AbstractBagladyModelResource(ModelResource):
+class AbstractModelResource(ModelResource):
     """
-    Provides some basic functionality for API resources.
+    The `AbstractModelResource` class provides generic
+    functionality for sub resources.
 
     """
 
     def obj_create(self, bundle, **kwargs):
         """
-        This method is called when the API tries to create a resource.
+        Sets the owner as the requesting user.
 
         """
-
-        # What is the public key?
-        public_key = Utils.get_value(bundle.request, 'public_key')
-
-        # If no public key, we should exit with a 401.
-        if public_key is None:
-            raise ImmediateHttpResponse(response=http.HttpUnauthorized())
-
-        # Otherwise, get the bag associated with the public key.
-        bag = Bag.objects.get(public_key=public_key)
-
-        # Get the owner of this bag.
-        owner = bag.owner
-
-        # Now we can create the object.
-        return super(AbstractBagladyModelResource, self).obj_create(bundle, bag=bag, owner=owner)
+        owner = bundle.request.user
+        parent = super(AbstractModelResource, self)
+        return parent.obj_create(bundle, owner=owner)
 
 
-class BagResource(AbstractBagladyModelResource):
+class BagResource(AbstractModelResource):
     """
     The `BagResource` class handles the API for Bags.
 
@@ -63,10 +50,13 @@ class BagResource(AbstractBagladyModelResource):
         queryset = Bag.objects.all()
 
         # Which class should handle authentication?
-        authorization = Authorization()
+        authentication = BasicAuthentication()
+
+        # Which class should handle authorization?
+        authorization = CustomAuthorization()
 
 
-class CategoryResource(AbstractBagladyModelResource):
+class CategoryResource(AbstractModelResource):
     """
     The `CategoryResource` class handles the API for Categories.
 
@@ -84,11 +74,14 @@ class CategoryResource(AbstractBagladyModelResource):
         # Which objects should we serve up to the API?
         queryset = Category.objects.all()
 
-        # Which class should handle authorization
-        authorization = Authorization()
+        # Which class should handle authentication?
+        authentication = BasicAuthentication()
+
+        # Which class should handle authorization?
+        authorization = CustomAuthorization()
 
 
-class ScribbleResource(AbstractBagladyModelResource):
+class ScribbleResource(AbstractModelResource):
     """
     The `ScribbleResource` class handles the API for Scribbles.
 
@@ -106,5 +99,8 @@ class ScribbleResource(AbstractBagladyModelResource):
         # Which objects should we serve up to the API?
         queryset = Scribble.objects.all()
 
+        # Which class should handle authentication?
+        authentication = BasicAuthentication()
+
         # Which class should handle authorization?
-        authorization = Authorization()
+        authorization = CustomAuthorization()

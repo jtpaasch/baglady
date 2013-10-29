@@ -10,12 +10,6 @@ import re
 # For sending emails. 
 from django.core.mail import send_mail
 
-# For generating unique ids.
-from uuid import uuid4
-
-# For hashing things.
-from hashlib import sha1
-
 
 class Bag(models.Model):
     """
@@ -33,33 +27,8 @@ class Bag(models.Model):
     # Who owns this bag?
     owner = models.ForeignKey(User)
 
-    # What is the public API key that identifies this bag?
-    public_key = models.CharField("Public API key", max_length=40, blank=True)
-
-    # What is the private API key used to identify this bag?
-    private_key = models.CharField("Private API key", max_length=40, blank=True)
-
     def __unicode__(self):
         return self.name
-
-    def save(self, *args, **kwargs):
-        """
-        This method is called whenever anyone tries to save this model.
-
-        """
-
-        # If no public key, generate one.
-        if not self.public_key:
-            key = str(uuid4())
-            self.public_key = sha1(key).hexdigest()
-
-        # If no private key, generate one.
-        if not self.private_key:
-            key = str(uuid4())
-            self.private_key = sha1(key).hexdigest()
-
-        # Now we can save.
-        super(Bag, self).save(*args, **kwargs)
 
 
 class Category(models.Model):
