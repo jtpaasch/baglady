@@ -129,6 +129,7 @@ INSTALLED_APPS = (
 
     # Custom apps.
     'apps.baglady',
+    'apps.brain',
 
 )
 

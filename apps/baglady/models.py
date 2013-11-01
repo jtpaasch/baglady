@@ -10,6 +10,12 @@ import re
 # For sending emails. 
 from django.core.mail import send_mail
 
+# For broadcasting messages project wide.
+from pubsub import pub
+
+# The pubsub module needs to know who's subscribed.
+import project.subscriptions
+
 
 class Bag(models.Model):
     """
@@ -102,6 +108,22 @@ class Scribble(models.Model):
 
         """
 
+        # Check that the data is valid.
+        self.check_validation()
+
+        # Now save the scribble
+        super(Scribble, self).save(*args, **kwargs)
+
+        # Broadcast that we've saved a scribble.
+        pub.sendMessage('new scribble', details=self)
+
+    def check_validation(self):
+        """
+        Checks the scribble against its category's pattern.
+        If it doesn't match, an email gets sent.
+
+        """
+
         # Check if the submitted content matches the valid pattern
         # recorded for the category.
         pattern = self.category.valid_pattern
@@ -115,8 +137,5 @@ class Scribble(models.Model):
             send_to = ['jt@nara.me']
             sent_from = 'baglady@nara.me'
             send_mail(subject_line, message, sent_from, send_to, fail_silently=False)
-
-        # Now save the scribble
-        super(Scribble, self).save(*args, **kwargs)
 
 
