@@ -164,8 +164,8 @@ LOGGING = {
     }
 }
 
-####################################################                            
-# EMAIL SETTINGS                                                                
+####################################################
+# EMAIL SETTINGS
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = '587'
